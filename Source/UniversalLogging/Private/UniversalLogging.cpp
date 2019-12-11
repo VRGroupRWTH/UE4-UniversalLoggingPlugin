@@ -7,10 +7,28 @@
 void UniversalLoggingImpl::StartupModule()
 {
   _streams.Add("", TUniquePtr<LogStreamImpl>(new LogStreamImpl()));
+
+  on_post_world_initialization_delegate_.BindRaw(this, &UniversalLoggingImpl::OnSessionStart);
+  FWorldDelegates::OnPostWorldInitialization.Add(on_post_world_initialization_delegate_);
+
+  on_pre_world_finish_destroy_delegate_.BindRaw(this, &UniversalLoggingImpl::OnSessionEnd);
+  FWorldDelegates::OnPreWorldFinishDestroy.Add(on_pre_world_finish_destroy_delegate_);
 }
 
 void UniversalLoggingImpl::ShutdownModule()
 {
+}
+
+void UniversalLoggingImpl::OnSessionStart(UWorld* world, const UWorld::InitializationValues)
+{
+  if (world->IsGameWorld())
+    Log("OnSessionStart", "Test");
+}
+
+void UniversalLoggingImpl::OnSessionEnd(UWorld* world)
+{
+  if (world->IsGameWorld())
+    Log("OnSessionEnd", "Test");
 }
 
 ILogStream* UniversalLoggingImpl::NewLogStream(const FString streamname)
@@ -40,16 +58,14 @@ ILogStream * UniversalLoggingImpl::GetDefaultLogStream()
 
 void UniversalLoggingImpl::Log(const FString text, const FString stream /*= ""*/, bool omit_newline /*= false*/)
 {
-  ILogStream* stream_obj = nullptr;
-  if (_streams.Contains(stream))
-    stream_obj = _streams[stream].Get();
-  else
-    stream_obj = NewLogStream(stream);
-  FString FilePath = FPaths::ConvertRelativePathToFull(FPaths::ProjectDir() + stream_obj->GetFilepath()) + "/" + stream_obj->GetFilename();
+  LogStreamImpl* stream_obj = nullptr;
+  if (!_streams.Contains(stream))
+    NewLogStream(stream);
+  stream_obj = _streams[stream].Get();
   FString full_text = text;
   if (!omit_newline)
     full_text += "\n";
-  FFileHelper::SaveStringToFile(full_text, *FilePath, FFileHelper::EEncodingOptions::AutoDetect, &IFileManager::Get(), EFileWrite::FILEWRITE_Append);
+  stream_obj->Write(full_text);
 }
 
 IMPLEMENT_MODULE(UniversalLoggingImpl, UniversalLogging)

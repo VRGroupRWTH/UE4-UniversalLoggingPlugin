@@ -4,6 +4,8 @@
 
 #include "ILogStream.h"
 
+// #include "fmt/printf.h"
+
 class IUniversalLogging : public IModuleInterface
 {
 public:
@@ -60,6 +62,17 @@ public:
   * Logs the given text to the given log stream. If no log stream is specified, the default is used.
   */
   virtual void Log(const FString text, const FString stream = "", bool omit_newline = false) = 0;
+
+  /**
+  * Advanced logging with printf like syntax.
+  * Note: Does not automatically add newline!
+  */
+  template<typename... TArgs>
+  void LogF(FString stream, FString format, TArgs&&... args)
+  {
+    FString out = FString::Printf(*format, args...);
+    Log(out, stream, true);
+  }
 };
 
 #define UniLog IUniversalLogging::Get()
