@@ -3,7 +3,7 @@
 class LogStreamImpl : public ILogStream
 {
 public:
-  LogStreamImpl(const FString filepath= "Saved/Logs", const FString filename = "UniversalLogging.log");
+  LogStreamImpl(const FString filepath= "Saved/Logs", const FString filename = "UniversalLogging.log", const bool per_session = false);
   virtual ~LogStreamImpl();
 
   FString GetFilepath() override;
@@ -19,6 +19,7 @@ public:
 private:
   const FString _filepath;
   const FString _filename;
+  bool _per_session;
 
   bool _is_open;
   bool _is_valid;

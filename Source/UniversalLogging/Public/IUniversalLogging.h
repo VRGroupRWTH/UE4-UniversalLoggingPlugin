@@ -10,8 +10,7 @@ class IUniversalLogging : public IModuleInterface
 {
 public:
   /**
-  * Singleton-like access to this module's interface.  This is just for convenience!
-  * Beware of calling this during the shutdown phase, though.  Your module might have been unloaded already.
+  * Singleton-like access to this module's interface. This should not be necessary as the intended use is through the UniLog macro
   *
   * @return Returns singleton instance, loading the module on demand if needed.
   */
@@ -42,7 +41,7 @@ public:
   *
   * @return the newly created log stream object.
   */
-  virtual ILogStream* NewLogStream(const FString streamname, const FString filepath, const FString filename) = 0;
+  virtual ILogStream* NewLogStream(const FString streamname, const FString filepath, const FString filename, bool per_session = false) = 0;
 
   /**
   * Getter for log streams.
@@ -57,6 +56,11 @@ public:
   * @return the default log stream.
   */
   virtual ILogStream* GetDefaultLogStream() = 0;
+
+  /**
+  * Get the current session identifier. It uniquely identifies each time the application starts.
+  */
+  virtual FString GetSessionIdentifier() = 0;
 
   /**
   * Logs the given text to the given log stream. If no log stream is specified, the default is used.

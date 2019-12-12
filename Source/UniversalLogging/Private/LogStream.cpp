@@ -4,11 +4,13 @@
 
 #include "HAL/PlatformFilemanager.h"
 
-LogStreamImpl::LogStreamImpl(const FString filepath, const FString filename)
+LogStreamImpl::LogStreamImpl(const FString filepath, const FString filename, const bool per_session)
   : _filepath(filepath)
   , _filename(filename)
+  , _per_session(per_session)
   , _is_open(false)
   , _is_valid(false)
+  , _file_handle(nullptr)
 {
   Open();
   if (_is_open)
@@ -38,8 +40,12 @@ bool LogStreamImpl::GetIsValid()
 
 void LogStreamImpl::Open()
 {
-  FString file_path = FPaths::ConvertRelativePathToFull(FPaths::ProjectDir() + _filepath) + "/" + _filename;
   IPlatformFile& platform_file = FPlatformFileManager::Get().GetPlatformFile();
+  FString file_path = FPaths::ConvertRelativePathToFull(FPaths::ProjectDir() + _filepath);
+  if(_per_session)
+    file_path += "/" + UniLog.GetSessionIdentifier();
+  platform_file.CreateDirectoryTree(*file_path);
+  file_path += "/" + _filename;
   _file_handle = platform_file.OpenWrite(*file_path);
   if (!_file_handle)
   {
@@ -53,8 +59,8 @@ void LogStreamImpl::Open()
 
 void LogStreamImpl::Close()
 {
-  if (_file_handle)
-    delete _file_handle;
+  delete _file_handle;
+  _file_handle = nullptr;
   _is_open = false;
 }
 
