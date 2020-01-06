@@ -6,61 +6,61 @@
 
 void UniversalLoggingImpl::StartupModule()
 {
-  _streams.Add("", TUniquePtr<LogStreamImpl>(new LogStreamImpl()));
+  Streams.Add("", MakeUnique<LogStreamImpl>());
 
-  on_post_world_initialization_delegate_.BindRaw(this, &UniversalLoggingImpl::OnSessionStart);
-  FWorldDelegates::OnPostWorldInitialization.Add(on_post_world_initialization_delegate_);
+  On_Post_World_Initialization_Delegate.BindRaw(this, &UniversalLoggingImpl::OnSessionStart);
+  FWorldDelegates::OnPostWorldInitialization.Add(On_Post_World_Initialization_Delegate);
 
-  on_pre_world_finish_destroy_delegate_.BindRaw(this, &UniversalLoggingImpl::OnSessionEnd);
-  FWorldDelegates::OnPreWorldFinishDestroy.Add(on_pre_world_finish_destroy_delegate_);
+  On_Pre_World_Finish_Destroy_Delegate.BindRaw(this, &UniversalLoggingImpl::OnSessionEnd);
+  FWorldDelegates::OnPreWorldFinishDestroy.Add(On_Pre_World_Finish_Destroy_Delegate);
 
-  _session_id = "";
+  Session_ID = "";
 }
 
 void UniversalLoggingImpl::ShutdownModule()
 {
 }
 
-void UniversalLoggingImpl::OnSessionStart(UWorld* world, const UWorld::InitializationValues)
+void UniversalLoggingImpl::OnSessionStart(UWorld* World, const UWorld::InitializationValues)
 {
-  if (!world->IsGameWorld())
+  if (!World->IsGameWorld())
     return;
-  if (world->IsPlayInEditor())
+  if (World->IsPlayInEditor())
     ResetSessionId("PlayInEditor");
-  else if (world->IsPlayInPreview())
+  else if (World->IsPlayInPreview())
     ResetSessionId("PlayInPreview");
   else
     ResetSessionId("Play");
 }
 
-void UniversalLoggingImpl::OnSessionEnd(UWorld* world)
+void UniversalLoggingImpl::OnSessionEnd(UWorld* World)
 {
-  if (!world->IsGameWorld())
+  if (!World->IsGameWorld())
     return;
   ResetSessionId("Stopped");
 
-  for (auto& elem : _streams)
+  for (auto& Elem : Streams)
   {
-    elem.Value->Close();
+    Elem.Value->Close();
   }
 }
 
-ILogStream* UniversalLoggingImpl::NewLogStream(const FString streamname)
+ILogStream* UniversalLoggingImpl::NewLogStream(const FString StreamName)
 {
-  _streams.Add(streamname, TUniquePtr<LogStreamImpl>(new LogStreamImpl("Saved/Logs", "UniversalLogging_" + streamname + ".log")));
-  return _streams[streamname].Get();
+  Streams.Add(StreamName, MakeUnique<LogStreamImpl>("Saved/Logs", "UniversalLogging_" + StreamName + ".log"));
+  return Streams[StreamName].Get();
 }
 
-ILogStream* UniversalLoggingImpl::NewLogStream(const FString streamname, const FString filepath, const FString filename, bool per_session /* = false*/)
+ILogStream* UniversalLoggingImpl::NewLogStream(const FString StreamName, const FString Filepath, const FString Filename, bool bPer_Session /* = false*/)
 {
-  _streams.Add(streamname, TUniquePtr<LogStreamImpl>(new LogStreamImpl(filepath, filename, per_session)));
-  return _streams[streamname].Get();
+  Streams.Add(StreamName, MakeUnique<LogStreamImpl>(Filepath, Filename, bPer_Session));
+  return Streams[StreamName].Get();
 }
 
-ILogStream * UniversalLoggingImpl::GetLogStream(const FString streamname)
+ILogStream * UniversalLoggingImpl::GetLogStream(const FString StreamName)
 {
-  if (_streams.Contains(streamname))
-    return _streams[streamname].Get();
+  if (Streams.Contains(StreamName))
+    return Streams[StreamName].Get();
   else 
     return nullptr;
 }
@@ -72,28 +72,28 @@ ILogStream * UniversalLoggingImpl::GetDefaultLogStream()
 
 FString UniversalLoggingImpl::GetSessionIdentifier()
 {
-  return _session_id;
+  return Session_ID;
 }
 
-void UniversalLoggingImpl::Log(const FString text, const FString stream /*= ""*/, bool omit_newline /*= false*/)
+void UniversalLoggingImpl::Log(const FString Text, const FString Stream /*= ""*/, const bool bOmit_Newline /*= false*/)
 {
-  LogStreamImpl* stream_obj = nullptr;
-  if (!_streams.Contains(stream))
-    NewLogStream(stream);
-  stream_obj = _streams[stream].Get();
-  FString full_text = text;
-  if (!omit_newline)
-    full_text += "\n";
-  stream_obj->Write(full_text);
+  LogStreamImpl* Stream_OBJ = nullptr;
+  if (!Streams.Contains(Stream))
+    NewLogStream(Stream);
+  Stream_OBJ = Streams[Stream].Get();
+  FString Full_Text = Text;
+  if (!bOmit_Newline)
+    Full_Text += "\n";
+  Stream_OBJ->Write(Full_Text);
 }
 
-void UniversalLoggingImpl::ResetSessionId(FString prefix)
+void UniversalLoggingImpl::ResetSessionId(FString Prefix)
 {
   FString timestamp = FGenericPlatformTime::StrTimestamp();
   timestamp = timestamp.Replace(TEXT("/"), TEXT("-"));
   timestamp = timestamp.Replace(TEXT(" "), TEXT("_"));
   timestamp = timestamp.Replace(TEXT(":"), TEXT("-"));
-  _session_id = FString::Printf(TEXT("%s_%s"), *prefix, *timestamp);
+  Session_ID = FString::Printf(TEXT("%s_%s"), *Prefix, *timestamp);
 }
 
 IMPLEMENT_MODULE(UniversalLoggingImpl, UniversalLogging)

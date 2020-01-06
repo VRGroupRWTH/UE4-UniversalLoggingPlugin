@@ -4,8 +4,6 @@
 
 #include "ILogStream.h"
 
-// #include "fmt/printf.h"
-
 class IUniversalLogging : public IModuleInterface
 {
 public:
@@ -30,25 +28,25 @@ public:
   }
 
   /**
-  * Creates a new log stream with the name UniversalLogging_<streamname>.log in <projectdir>/Saved/Logs.
+  * Creates a new log stream with the name UniversalLogging_<StreamName>.log in <projectdir>/Saved/Logs.
   *
   * @return the newly created log stream object.
   */
-  virtual ILogStream* NewLogStream(const FString streamname) = 0;
+  virtual ILogStream* NewLogStream(const FString StreamName) = 0;
 
   /**
   * Creates a new log stream with the name <filename> in <projectdir>/<filepath>.
   *
   * @return the newly created log stream object.
   */
-  virtual ILogStream* NewLogStream(const FString streamname, const FString filepath, const FString filename, bool per_session = false) = 0;
+  virtual ILogStream* NewLogStream(const FString StreamName, const FString Filepath, const FString Filename, bool bPer_Session = false) = 0;
 
   /**
   * Getter for log streams.
   *
   * @return the requested log stream or nullptr if it does not exist.
   */
-  virtual ILogStream* GetLogStream(const FString streamname) = 0;
+  virtual ILogStream* GetLogStream(const FString StreamName) = 0;
 
   /**
   * Getter for the default log streams (convenience). Equivalent to GetLogStream("").
@@ -65,17 +63,17 @@ public:
   /**
   * Logs the given text to the given log stream. If no log stream is specified, the default is used.
   */
-  virtual void Log(const FString text, const FString stream = "", bool omit_newline = false) = 0;
+  virtual void Log(const FString Text, const FString Stream = "", const bool bOmit_Newline = false) = 0;
 
   /**
   * Advanced logging with printf like syntax.
   * Note: Does not automatically add newline!
   */
   template<typename... TArgs>
-  void LogF(FString stream, FString format, TArgs&&... args)
+  void LogF(const FString Stream, const FString Format, TArgs&&... Args)
   {
-    FString out = FString::Printf(*format, args...);
-    Log(out, stream, true);
+    const FString Out = FString::Printf(*Format, Args...);
+    Log(Out, Stream, true);
   }
 };
 

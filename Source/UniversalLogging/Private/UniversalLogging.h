@@ -8,24 +8,24 @@ class UniversalLoggingImpl : public IUniversalLogging
 {
 public:
   /** IModuleInterface implementation */
-  void StartupModule();
-  void ShutdownModule();
+  void StartupModule() override;
+  void ShutdownModule() override;
 
   void OnSessionStart(UWorld*, const UWorld::InitializationValues);
   void OnSessionEnd(UWorld*);
 
-  ILogStream* NewLogStream(const FString streamname) override;
-  ILogStream* NewLogStream(const FString streamname, const FString filepath, const FString filename, bool per_session = false) override;
-  ILogStream* GetLogStream(const FString streamname) override;
+  ILogStream* NewLogStream(const FString StreamName) override;
+  ILogStream* NewLogStream(const FString StreamName, const FString Filepath, const FString Filename, bool bPer_Session = false) override;
+  ILogStream* GetLogStream(const FString StreamName) override;
   ILogStream* GetDefaultLogStream() override;
   FString GetSessionIdentifier() override;
-  void Log(const FString text, const FString stream = "", bool omit_newline = false) override;
+  void Log(const FString Text, const FString Stream = "", const bool bOmit_Newline = false) override;
 
-  void ResetSessionId(FString prefix);
+  void ResetSessionId(FString Prefix);
 
 private:
-  TMap<FString, TUniquePtr<LogStreamImpl>> _streams;
-  FString _session_id;
-  TBaseDelegate<void, UWorld*, const UWorld::InitializationValues> on_post_world_initialization_delegate_;
-  TBaseDelegate<void, UWorld*> on_pre_world_finish_destroy_delegate_;
+  TMap<FString, TUniquePtr<LogStreamImpl>> Streams;
+  FString Session_ID;
+  TBaseDelegate<void, UWorld*, const UWorld::InitializationValues> On_Post_World_Initialization_Delegate;
+  TBaseDelegate<void, UWorld*> On_Pre_World_Finish_Destroy_Delegate;
 };
