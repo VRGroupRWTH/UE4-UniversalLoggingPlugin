@@ -10,6 +10,8 @@ LogStreamImpl::LogStreamImpl(const FString Filepath, const FString Filename, con
   : Filepath(Filepath)
   , Filename(Filename)
   , bPer_Session(bPer_Session)
+  , bOnScreen(false)
+  , OnScreenColor(0, 0, 255, 255)
   , bIs_Open(false)
   , bIs_Valid(false)
   , File_Handle(nullptr)
@@ -33,6 +35,26 @@ FString LogStreamImpl::GetFilepath()
 FString LogStreamImpl::GetFilename()
 {
   return Filename;
+}
+
+void LogStreamImpl::SetOnScreen(const bool Val)
+{
+  bOnScreen = Val;
+}
+
+bool LogStreamImpl::GetOnScreen() const
+{
+  return bOnScreen;
+}
+
+void LogStreamImpl::SetOnScreenColor(const FColor Color)
+{
+  OnScreenColor = Color;
+}
+
+FColor LogStreamImpl::GetOnScreenColor() const
+{
+  return OnScreenColor;
 }
 
 bool LogStreamImpl::GetIsValid()
@@ -71,11 +93,11 @@ bool LogStreamImpl::GetIsOpen() const
   return bIs_Open;
 }
 
-void LogStreamImpl::Write(const FString text)
+void LogStreamImpl::Write(const FString Text)
 {
   if (!bIs_Valid)
     return;
   if (!bIs_Open)
     Open();
-  File_Handle->Write(reinterpret_cast<const uint8*>(TCHAR_TO_ANSI(*text)), text.Len());
+  File_Handle->Write(reinterpret_cast<const uint8*>(TCHAR_TO_ANSI(*Text)), Text.Len());
 }
