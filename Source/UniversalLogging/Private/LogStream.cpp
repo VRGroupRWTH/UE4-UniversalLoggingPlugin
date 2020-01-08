@@ -1,25 +1,33 @@
 #include "UniversalLoggingPrivatePCH.h"
 
 #include "LogStream.h"
+#include "UniversalLogging.h"
 
 #include "HAL/PlatformFilemanager.h"
 #include "Paths.h"
 #include "IPlatformFileProfilerWrapper.h"
 
-LogStreamImpl::LogStreamImpl(const FString Filepath, const FString Filename, const bool bPer_Session)
+LogStreamImpl::LogStreamImpl(const FString Filepath, const FString Filename, const bool bPer_Session, const bool bLogOnMaster, const bool bLogOnSlaves)
   : Filepath(Filepath)
   , Filename(Filename)
   , bPer_Session(bPer_Session)
   , bOnScreen(false)
   , OnScreenColor(0, 0, 255, 255)
+  , bLogOnMaster(bLogOnMaster)
+  , bLogOnSlaves(bLogOnSlaves)
+  , bLogOnScreenOnMaster(true)
+  , bLogOnScreenOnSlaves(false)
   , bIs_Open(false)
   , bIs_Valid(false)
   , File_Handle(nullptr)
 {
-  Open();
-  if (bIs_Open)
-    bIs_Valid = true;
-  Close();
+  if (bLogOnMaster && UniversalLoggingImpl::IsClusterMaster() || bLogOnSlaves && !UniversalLoggingImpl::IsClusterMaster())
+  {
+    Open();
+    if (bIs_Open)
+      bIs_Valid = true;
+    Close();
+  }
 }
 
 LogStreamImpl::~LogStreamImpl()
@@ -55,6 +63,36 @@ void LogStreamImpl::SetOnScreenColor(const FColor Color)
 FColor LogStreamImpl::GetOnScreenColor() const
 {
   return OnScreenColor;
+}
+
+bool LogStreamImpl::GetLogOnMaster() const
+{
+  return bLogOnMaster;
+}
+
+bool LogStreamImpl::GetLogOnSlaves() const
+{
+  return bLogOnSlaves;
+}
+
+void LogStreamImpl::SetLogOnScreenOnMaster(const bool Val)
+{
+  bLogOnScreenOnMaster = Val;
+}
+
+bool LogStreamImpl::GetLogOnScreenOnMaster() const
+{
+  return bLogOnScreenOnMaster;
+}
+
+void LogStreamImpl::SetLogOnScreenOnSlaves(const bool Val)
+{
+  bLogOnScreenOnSlaves = Val;
+}
+
+bool LogStreamImpl::GetLogOnScreenOnSlaves() const
+{
+  return bLogOnScreenOnSlaves;
 }
 
 bool LogStreamImpl::GetIsValid()

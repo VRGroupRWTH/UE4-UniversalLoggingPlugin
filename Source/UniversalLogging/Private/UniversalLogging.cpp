@@ -5,7 +5,8 @@
 #include "LogStream.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/HUD.h"
-#include "GameFramework/GameModeBase.h"
+#include "IDisplayCluster.h"
+#include "Cluster/IDisplayClusterClusterManager.h"
 
 void UniversalLoggingImpl::StartupModule()
 {
@@ -65,13 +66,21 @@ void UniversalLoggingImpl::OnPostActorTick(UWorld* World, ELevelTick LevelTick, 
 
 ILogStream* UniversalLoggingImpl::NewLogStream(const FString StreamName)
 {
-  Streams.Add(StreamName, MakeUnique<LogStreamImpl>("Saved/Logs", "UniversalLogging_" + StreamName + ".log"));
-  return Streams[StreamName].Get();
+  return NewLogStream(StreamName, "Saved/Logs", "UniversalLogging_" + StreamName + ".log");
 }
 
-ILogStream* UniversalLoggingImpl::NewLogStream(const FString StreamName, const FString Filepath, const FString Filename, bool bPer_Session /* = false*/)
+ILogStream* UniversalLoggingImpl::NewLogStream(const FString StreamName, const FString Filepath, const FString Filename,
+                                               bool bPer_Session /* = false*/, bool bLogOnMaster/* = true*/,
+                                               const bool bLogOnSlaves/* = false*/)
 {
-  Streams.Add(StreamName, MakeUnique<LogStreamImpl>(Filepath, Filename, bPer_Session));
+  FString NewFilepath = Filepath;
+  FString NewFilename = Filename;
+  if(bLogOnSlaves && !IsClusterMaster())
+  {
+    NewFilepath = Filepath + "/slavelogs";
+    NewFilename = GetNodeName() + "_" + Filename;
+  }
+  Streams.Add(StreamName, MakeUnique<LogStreamImpl>(NewFilepath, NewFilename, bPer_Session, bLogOnMaster, bLogOnSlaves));
   return Streams[StreamName].Get();
 }
 
@@ -95,17 +104,22 @@ FString UniversalLoggingImpl::GetSessionIdentifier()
 
 void UniversalLoggingImpl::Log(const FString Text, const FString Stream /*= ""*/, const bool bOmit_Newline /*= false*/)
 {
-  LogStreamImpl* Stream_OBJ = nullptr;
   if (!Streams.Contains(Stream))
     NewLogStream(Stream);
-  Stream_OBJ = Streams[Stream].Get();
+  LogStreamImpl* Stream_OBJ = Streams[Stream].Get();
+
   FString Full_Text = Text;
   if (!bOmit_Newline)
     Full_Text += "\n";
-  Stream_OBJ->Write(Full_Text);
+
+  if (Stream_OBJ->GetLogOnMaster() && IsClusterMaster() || Stream_OBJ->GetLogOnSlaves() && IsClusterMaster())
+  {
+    Stream_OBJ->Write(Full_Text);
+  }
 
   if(Stream_OBJ->GetOnScreen() && On_Screen_Log_Actor)
   {
+    if (Stream_OBJ->GetLogOnScreenOnMaster() && IsClusterMaster() || Stream_OBJ->GetLogOnScreenOnSlaves() && !IsClusterMaster())
     On_Screen_Log_Actor->EnqueueMessage(Full_Text, Stream_OBJ->GetOnScreenColor());
   }
 }
@@ -117,6 +131,24 @@ void UniversalLoggingImpl::ResetSessionId(FString Prefix)
   timestamp = timestamp.Replace(TEXT(" "), TEXT("_"));
   timestamp = timestamp.Replace(TEXT(":"), TEXT("-"));
   Session_ID = FString::Printf(TEXT("%s_%s"), *Prefix, *timestamp);
+}
+
+bool UniversalLoggingImpl::IsClusterMaster()
+{
+  IDisplayClusterClusterManager* Manager = IDisplayCluster::Get().GetClusterMgr();
+  if (Manager == nullptr)
+  {
+    return true; // if we are not in cluster mode, we are always the master
+  }
+  return Manager->IsMaster();
+}
+
+FString UniversalLoggingImpl::GetNodeName()
+{
+  if (IDisplayCluster::Get().GetOperationMode() == EDisplayClusterOperationMode::Cluster)
+    return IDisplayCluster::Get().GetClusterMgr()->GetNodeId();
+  else 
+    return FString(TEXT("Localhost"));
 }
 
 IMPLEMENT_MODULE(UniversalLoggingImpl, UniversalLogging)

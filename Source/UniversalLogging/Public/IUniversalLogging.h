@@ -39,7 +39,9 @@ public:
   *
   * @return the newly created log stream object.
   */
-  virtual ILogStream* NewLogStream(const FString StreamName, const FString Filepath, const FString Filename, bool bPer_Session = false) = 0;
+  virtual ILogStream* NewLogStream(const FString StreamName, const FString Filepath, const FString Filename,
+                                   bool bPer_Session = false, const bool bLogOnMaster = true,
+                                   const bool bLogOnSlaves = false) = 0;
 
   /**
   * Getter for log streams.

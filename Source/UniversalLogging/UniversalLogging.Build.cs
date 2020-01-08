@@ -8,6 +8,6 @@ public class UniversalLogging : ModuleRules
         PrivateIncludePaths.AddRange(new string[] { "UniversalLogging/Private" });
         PublicIncludePaths.AddRange(new string[] { "UniversalLogging/Public" });
 
-        PublicDependencyModuleNames.AddRange(new string[] { "CoreUObject", "Engine", "Core" });
+        PublicDependencyModuleNames.AddRange(new string[] { "CoreUObject", "Engine", "Core", "DisplayCluster" });
     }
 }

@@ -18,13 +18,18 @@ public:
   void OnPostActorTick(UWorld*, ELevelTick, float);
 
   ILogStream* NewLogStream(const FString StreamName) override;
-  ILogStream* NewLogStream(const FString StreamName, const FString Filepath, const FString Filename, bool bPer_Session = false) override;
+  ILogStream* NewLogStream(const FString StreamName, const FString Filepath, const FString Filename,
+                           bool bPer_Session = false, const bool bLogOnMaster = true,
+                           const bool bLogOnSlaves = false) override;
   ILogStream* GetLogStream(const FString StreamName) override;
   ILogStream* GetDefaultLogStream() override;
   FString GetSessionIdentifier() override;
   void Log(const FString Text, const FString Stream = "", const bool bOmit_Newline = false) override;
 
   void ResetSessionId(FString Prefix);
+  // Helper functions for nDisplay
+  static bool IsClusterMaster(); 
+  static FString GetNodeName();
 
 private:
   TMap<FString, TUniquePtr<LogStreamImpl>> Streams;
