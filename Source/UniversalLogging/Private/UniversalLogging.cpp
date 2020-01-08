@@ -112,14 +112,14 @@ void UniversalLoggingImpl::Log(const FString Text, const FString Stream /*= ""*/
   if (!bOmit_Newline)
     Full_Text += "\n";
 
-  if (Stream_OBJ->GetLogOnMaster() && IsClusterMaster() || Stream_OBJ->GetLogOnSlaves() && IsClusterMaster())
+  if ((Stream_OBJ->GetLogOnMaster() && IsClusterMaster()) || (Stream_OBJ->GetLogOnSlaves() && IsClusterMaster()))
   {
     Stream_OBJ->Write(Full_Text);
   }
 
   if(Stream_OBJ->GetOnScreen() && On_Screen_Log_Actor)
   {
-    if (Stream_OBJ->GetLogOnScreenOnMaster() && IsClusterMaster() || Stream_OBJ->GetLogOnScreenOnSlaves() && !IsClusterMaster())
+    if ((Stream_OBJ->GetLogOnScreenOnMaster() && IsClusterMaster()) || (Stream_OBJ->GetLogOnScreenOnSlaves() && !IsClusterMaster()))
     On_Screen_Log_Actor->EnqueueMessage(Full_Text, Stream_OBJ->GetOnScreenColor());
   }
 }

@@ -21,7 +21,7 @@ LogStreamImpl::LogStreamImpl(const FString Filepath, const FString Filename, con
   , bIs_Valid(false)
   , File_Handle(nullptr)
 {
-  if (bLogOnMaster && UniversalLoggingImpl::IsClusterMaster() || bLogOnSlaves && !UniversalLoggingImpl::IsClusterMaster())
+  if ((bLogOnMaster && UniversalLoggingImpl::IsClusterMaster()) || (bLogOnSlaves && !UniversalLoggingImpl::IsClusterMaster()))
   {
     Open();
     if (bIs_Open)
