@@ -87,7 +87,7 @@ stream->SetOnScreen(true);
 You can also change the color of the messages, to distinguish multiple streams that are logging to the screen at the same time:
 
 ```cpp
-stream->SetOnScreenColor(FColor(255, 0, 255, 255)); #FColor parameters are int8 RGBA
+stream->SetOnScreenColor(FColor(255, 0, 255, 255)); // FColor parameters are int8 RGBA
 ```
 
 By default, the on screen messages are only shown on the master in cluster mode. You can change this behavior using:
