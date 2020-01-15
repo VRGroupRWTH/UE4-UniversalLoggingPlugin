@@ -7,6 +7,7 @@
 #include "GameFramework/HUD.h"
 #include "IDisplayCluster.h"
 #include "Cluster/IDisplayClusterClusterManager.h"
+#include "Misc/CommandLine.h"
 
 void UniversalLoggingImpl::StartupModule()
 {
@@ -126,6 +127,19 @@ void UniversalLoggingImpl::Log(const FString Text, const FString Stream /*= ""*/
 
 void UniversalLoggingImpl::ResetSessionId(FString Prefix)
 {
+  TArray<FString> Tokens;
+  TArray<FString> Switches;
+  FCommandLine::Parse(FCommandLine::Get(), Tokens, Switches);
+  for (auto Token : Tokens)
+  {
+    if (Token.StartsWith("SessionID"))
+    {
+      Token.RemoveFromStart("SessionID=");
+      Session_ID = Token;
+      return;
+    }
+  }
+
   FString timestamp = FGenericPlatformTime::StrTimestamp();
   timestamp = timestamp.Replace(TEXT("/"), TEXT("-"));
   timestamp = timestamp.Replace(TEXT(" "), TEXT("_"));
