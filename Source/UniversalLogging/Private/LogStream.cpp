@@ -28,6 +28,10 @@ LogStreamImpl::LogStreamImpl(const FString Filepath, const FString Filename, con
       bIs_Valid = true;
     Close();
   }
+  else
+  {
+    bIs_Valid = true;
+  }
 }
 
 LogStreamImpl::~LogStreamImpl()

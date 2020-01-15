@@ -112,7 +112,7 @@ void UniversalLoggingImpl::Log(const FString Text, const FString Stream /*= ""*/
   if (!bOmit_Newline)
     Full_Text += "\n";
 
-  if ((Stream_OBJ->GetLogOnMaster() && IsClusterMaster()) || (Stream_OBJ->GetLogOnSlaves() && IsClusterMaster()))
+  if ((Stream_OBJ->GetLogOnMaster() && IsClusterMaster()) || (Stream_OBJ->GetLogOnSlaves() && !IsClusterMaster()))
   {
     Stream_OBJ->Write(Full_Text);
   }
