@@ -15,6 +15,15 @@ public:
   bool GetOnScreen() const override;
   void SetOnScreenColor(const FColor Color) override;
   FColor GetOnScreenColor() const override;
+  void SetOnScreenBackgroundColor(const FColor Color) override;
+  FColor GetOnScreenBackgroundColor() const override;
+  void SetOnScreenSize(const float Scale) override;
+  float GetOnScreenSize() const override;
+  void SetOnScreenDuration(const float Seconds) override;
+  float GetOnScreenDuration() const override;
+
+  void SetLogToDefaultLog(const bool Val) override;
+  bool GetLogToDefaultLog() const override;
 
   bool GetLogOnMaster() const override;
   bool GetLogOnSlaves() const override;
@@ -38,6 +47,11 @@ private:
 
   bool bOnScreen;
   FColor OnScreenColor;
+  FColor OnScreenBackgroundColor;
+  float OnScreenSize;
+  float OnScreenDuration;
+
+  bool bLogToDefaultLog;
 
   bool bLogOnMaster;
   bool bLogOnSlaves;

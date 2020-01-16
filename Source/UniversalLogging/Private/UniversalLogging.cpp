@@ -121,7 +121,14 @@ void UniversalLoggingImpl::Log(const FString Text, const FString Stream /*= ""*/
   if(Stream_OBJ->GetOnScreen() && On_Screen_Log_Actor)
   {
     if ((Stream_OBJ->GetLogOnScreenOnMaster() && IsClusterMaster()) || (Stream_OBJ->GetLogOnScreenOnSlaves() && !IsClusterMaster()))
-    On_Screen_Log_Actor->EnqueueMessage(Full_Text, Stream_OBJ->GetOnScreenColor());
+    On_Screen_Log_Actor->EnqueueMessage(Full_Text, Stream_OBJ->GetOnScreenColor(),
+                                        Stream_OBJ->GetOnScreenBackgroundColor(), Stream_OBJ->GetOnScreenSize(),
+                                        Stream_OBJ->GetOnScreenDuration());
+  }
+
+  if(Stream_OBJ->GetLogToDefaultLog())
+  {
+    UE_LOG(LogTemp, Log, TEXT("[Universal Logging][%s] %s"), *Stream, *Full_Text);
   }
 }
 

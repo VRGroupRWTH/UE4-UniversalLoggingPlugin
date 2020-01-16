@@ -19,7 +19,7 @@ public:
 	// Sets default values for this actor's properties
 	AOnScreenLog();
 
-  void EnqueueMessage(const FString Text, const FColor Color);
+  void EnqueueMessage(const FString Text, const FColor Color, const FColor BackgroundColor, const float Scale, const float Duration);
 
 protected:
 	// Called when the game starts or when spawned
@@ -35,6 +35,8 @@ private:
   {
     FString Text;
     FColor Color;
+    FColor BackgroundColor;
+    float Scale;
     float TimeToLive;
   };
   TArray<FMessage> Message_Queue;

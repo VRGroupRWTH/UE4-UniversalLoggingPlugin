@@ -12,12 +12,14 @@ AOnScreenLog::AOnScreenLog()
 
 }
 
-void AOnScreenLog::EnqueueMessage(const FString Text, const FColor Color)
+void AOnScreenLog::EnqueueMessage(const FString Text, const FColor Color, const FColor BackgroundColor, const float Scale, const float Duration)
 {
   FMessage Message;
   Message.Text = Text;
   Message.Color = Color;
-  Message.TimeToLive = 5.0;
+  Message.BackgroundColor = BackgroundColor;
+  Message.Scale = Scale;
+  Message.TimeToLive = Duration;
   Message_Queue.Insert(Message, 0);
 }
 
@@ -32,18 +34,17 @@ void AOnScreenLog::BeginPlay()
 void AOnScreenLog::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-  for (int i = 0; i < Message_Queue.Num(); i++)
+  for (int i = Message_Queue.Num(); --i;)
   {
     Message_Queue[i].TimeToLive -= DeltaTime;
     if(Message_Queue[i].TimeToLive < 1.0) // Fade out
     {
       Message_Queue[i].Color.A = Message_Queue[i].TimeToLive * 255;
     }
-  }
-  FMessage LastMessage;
-  while (Message_Queue.Num() > 0 && Message_Queue.Top().TimeToLive <= 0) 
-  {
-    Message_Queue.Pop();
+    if(Message_Queue[i].TimeToLive <= 0.0) // Remove (works because array is traversed backwards)
+    {
+      Message_Queue.RemoveAt(i);
+    }
   }
 }
 
@@ -52,8 +53,16 @@ void AOnScreenLog::PostRenderFor(APlayerController* PC, UCanvas* Canvas, FVector
   float YOffset = 50;
   for (auto Message : Message_Queue)
   {
+    int Height;
+    int Width;
+    myFont.Object->GetStringHeightAndWidth(Message.Text, Height, Width);
+    Canvas->DrawColor = Message.BackgroundColor;
+    FVector2D BoxPosition(10, YOffset);
+    FVector2D BoxSize(Width * Message.Scale, Height * Message.Scale);
+    FCanvasBoxItem Box(BoxPosition, BoxSize);
+    Canvas->DrawItem(Box);
     Canvas->DrawColor = Message.Color;
-    YOffset += Canvas->DrawText(myFont.Object, Message.Text, 10, YOffset);
+    YOffset += Canvas->DrawText(myFont.Object, Message.Text, 10, YOffset, Message.Scale, Message.Scale);
   }
 }
 
