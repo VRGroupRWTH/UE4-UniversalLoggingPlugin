@@ -12,7 +12,7 @@ LogStreamImpl::LogStreamImpl(const FString Filepath, const FString Filename, con
   , Filename(Filename)
   , bPer_Session(bPer_Session)
   , bOnScreen(false)
-  , OnScreenColor(0, 0, 255, 255)
+  , OnScreenColor(255, 255, 255, 255)
   , OnScreenBackgroundColor(0, 0, 0, 128)
   , OnScreenSize(1.0)
   , OnScreenDuration(5.0)

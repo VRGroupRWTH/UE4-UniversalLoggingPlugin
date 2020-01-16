@@ -36,6 +36,7 @@ private:
     FString Text;
     FColor Color;
     FColor BackgroundColor;
+    float AlphaFactor;
     float Scale;
     float TimeToLive;
   };

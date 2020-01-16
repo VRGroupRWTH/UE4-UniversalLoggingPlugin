@@ -18,6 +18,7 @@ void AOnScreenLog::EnqueueMessage(const FString Text, const FColor Color, const 
   Message.Text = Text;
   Message.Color = Color;
   Message.BackgroundColor = BackgroundColor;
+  Message.AlphaFactor = 1.0;
   Message.Scale = Scale;
   Message.TimeToLive = Duration;
   Message_Queue.Insert(Message, 0);
@@ -34,12 +35,12 @@ void AOnScreenLog::BeginPlay()
 void AOnScreenLog::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-  for (int i = Message_Queue.Num(); --i;)
+  for (int i = Message_Queue.Num(); i--;)
   {
     Message_Queue[i].TimeToLive -= DeltaTime;
     if(Message_Queue[i].TimeToLive < 1.0) // Fade out
     {
-      Message_Queue[i].Color.A = Message_Queue[i].TimeToLive * 255;
+      Message_Queue[i].AlphaFactor = Message_Queue[i].TimeToLive;
     }
     if(Message_Queue[i].TimeToLive <= 0.0) // Remove (works because array is traversed backwards)
     {
@@ -56,12 +57,16 @@ void AOnScreenLog::PostRenderFor(APlayerController* PC, UCanvas* Canvas, FVector
     int Height;
     int Width;
     myFont.Object->GetStringHeightAndWidth(Message.Text, Height, Width);
-    Canvas->DrawColor = Message.BackgroundColor;
     FVector2D BoxPosition(10, YOffset);
     FVector2D BoxSize(Width * Message.Scale, Height * Message.Scale);
-    FCanvasBoxItem Box(BoxPosition, BoxSize);
+    FLinearColor BoxColor = FLinearColor(Message.BackgroundColor);
+    BoxColor.A *= Message.AlphaFactor;
+    FCanvasTileItem Box(BoxPosition, BoxSize, BoxColor);
+    Box.BlendMode = ESimpleElementBlendMode::SE_BLEND_Translucent;
     Canvas->DrawItem(Box);
-    Canvas->DrawColor = Message.Color;
+    FColor TextColor = Message.Color;
+    TextColor.A *= Message.AlphaFactor;
+    Canvas->DrawColor = TextColor;
     YOffset += Canvas->DrawText(myFont.Object, Message.Text, 10, YOffset, Message.Scale, Message.Scale);
   }
 }
