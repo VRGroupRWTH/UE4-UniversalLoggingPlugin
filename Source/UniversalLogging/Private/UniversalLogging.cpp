@@ -1,5 +1,3 @@
-#include "UniversalLoggingPrivatePCH.h"
-
 #include "UniversalLogging.h"
 
 #include "LogStream.h"
