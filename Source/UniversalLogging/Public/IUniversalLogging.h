@@ -71,10 +71,12 @@ public:
   * Advanced logging with printf like syntax.
   * Note: Does not automatically add newline!
   */
-  template<typename... TArgs>
-  void LogF(const FString Stream, const FString Format, TArgs&&... Args)
+  template<typename FmtType, typename... TArgs>
+  void LogF(const FString Stream, const FmtType& Format, TArgs&&... Args)
   {
-    const FString Out = FString::Printf(*Format, Args...);
+    static_assert(TIsArrayOrRefOfType<FmtType, TCHAR>::Value, "Format must be a TCHAR string literal, i.e., only ever call this function with TEXT(\"...\") as the second parameter.");
+
+    const FString Out = FString::Printf(Format, Args...);
     Log(Out, Stream, true);
   }
 };
