@@ -1,5 +1,3 @@
-#include "UniversalLoggingPrivatePCH.h"
-
 #include "LogStream.h"
 #include "UniversalLogging.h"
 
@@ -12,7 +10,11 @@ LogStreamImpl::LogStreamImpl(const FString Filepath, const FString Filename, con
   , Filename(Filename)
   , bPer_Session(bPer_Session)
   , bOnScreen(false)
-  , OnScreenColor(0, 0, 255, 255)
+  , OnScreenColor(255, 255, 255, 255)
+  , OnScreenBackgroundColor(0, 0, 0, 128)
+  , OnScreenSize(1.0)
+  , OnScreenDuration(5.0)
+  , bLogToDefaultLog(false)
   , bLogOnMaster(bLogOnMaster)
   , bLogOnSlaves(bLogOnSlaves)
   , bLogOnScreenOnMaster(true)
@@ -69,6 +71,46 @@ FColor LogStreamImpl::GetOnScreenColor() const
   return OnScreenColor;
 }
 
+void LogStreamImpl::SetOnScreenBackgroundColor(const FColor Color)
+{
+  OnScreenBackgroundColor = Color;
+}
+
+FColor LogStreamImpl::GetOnScreenBackgroundColor() const
+{
+  return OnScreenBackgroundColor;
+}
+
+void LogStreamImpl::SetOnScreenSize(const float Scale)
+{
+  OnScreenSize = Scale;
+}
+
+float LogStreamImpl::GetOnScreenSize() const
+{
+  return OnScreenSize;
+}
+
+void LogStreamImpl::SetOnScreenDuration(const float Seconds)
+{
+  OnScreenDuration = Seconds;
+}
+
+float LogStreamImpl::GetOnScreenDuration() const
+{
+  return OnScreenDuration;
+}
+
+void LogStreamImpl::SetLogToDefaultLog(const bool Val)
+{
+  bLogToDefaultLog = Val;
+}
+
+bool LogStreamImpl::GetLogToDefaultLog() const
+{
+  return bLogToDefaultLog;
+}
+
 bool LogStreamImpl::GetLogOnMaster() const
 {
   return bLogOnMaster;
@@ -81,6 +123,8 @@ bool LogStreamImpl::GetLogOnSlaves() const
 
 void LogStreamImpl::SetLogOnScreenOnMaster(const bool Val)
 {
+  if(Val) // to avoid confusion, this also enables logging
+    SetOnScreen(true); 
   bLogOnScreenOnMaster = Val;
 }
 
@@ -91,6 +135,8 @@ bool LogStreamImpl::GetLogOnScreenOnMaster() const
 
 void LogStreamImpl::SetLogOnScreenOnSlaves(const bool Val)
 {
+  if (Val) // to avoid confusion, this also enables logging
+    SetOnScreen(true);
   bLogOnScreenOnSlaves = Val;
 }
 

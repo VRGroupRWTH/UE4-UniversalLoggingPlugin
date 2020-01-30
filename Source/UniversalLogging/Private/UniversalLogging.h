@@ -2,6 +2,7 @@
 
 #include "LogStream.h"
 #include "OnScreenLog.h"
+#include "IUniversalLogging.h"
 
 #include "Engine/World.h"
 
