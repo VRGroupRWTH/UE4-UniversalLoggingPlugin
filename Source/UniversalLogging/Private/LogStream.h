@@ -1,5 +1,5 @@
 #pragma once
-#include "Color.h"
+#include "Math/Color.h"
 
 class LogStreamImpl : public ILogStream
 {

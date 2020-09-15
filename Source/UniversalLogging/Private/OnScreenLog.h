@@ -5,8 +5,8 @@
 #include "CoreMinimal.h"
 #include "Engine/Font.h"
 #include "GameFramework/Actor.h"
-#include "ConstructorHelpers.h"
-#include "Queue.h"
+#include "UObject/ConstructorHelpers.h"
+#include "Containers/Queue.h"
 #include "OnScreenLog.generated.h"
 
 UCLASS()

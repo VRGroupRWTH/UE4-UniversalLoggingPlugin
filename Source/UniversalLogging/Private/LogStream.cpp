@@ -4,8 +4,8 @@
 #include "UniversalLogging.h"
 
 #include "HAL/PlatformFilemanager.h"
-#include "Paths.h"
-#include "IPlatformFileProfilerWrapper.h"
+#include "Misc/Paths.h"
+#include "HAL/IPlatformFileProfilerWrapper.h"
 
 LogStreamImpl::LogStreamImpl(const FString Filepath, const FString Filename, const bool bPer_Session, const bool bLogOnMaster, const bool bLogOnSlaves)
   : Filepath(Filepath)

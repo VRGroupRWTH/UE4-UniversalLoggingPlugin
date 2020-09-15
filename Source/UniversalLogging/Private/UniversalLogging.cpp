@@ -1,6 +1,7 @@
+#include "UniversalLogging.h"
+
 #include "UniversalLoggingPrivatePCH.h"
 
-#include "UniversalLogging.h"
 
 #include "LogStream.h"
 #include "GameFramework/PlayerController.h"
@@ -149,6 +150,10 @@ void UniversalLoggingImpl::ResetSessionId(FString Prefix)
 
 bool UniversalLoggingImpl::IsClusterMaster()
 {
+  if (!IDisplayCluster::IsAvailable()) 
+  {
+     return true;
+  }
   IDisplayClusterClusterManager* Manager = IDisplayCluster::Get().GetClusterMgr();
   if (Manager == nullptr)
   {
