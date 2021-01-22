@@ -1,6 +1,7 @@
 #pragma once
 
-#include "ModuleManager.h"
+#include "IDisplayCluster.h"
+#include "Modules/ModuleManager.h"
 
 #include "ILogStream.h"
 

@@ -1,6 +1,8 @@
 #pragma once
-#include "Color.h"
+
 #include "ILogStream.h"
+
+#include "Math/Color.h"
 
 class LogStreamImpl : public ILogStream
 {
