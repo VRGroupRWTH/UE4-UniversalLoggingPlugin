@@ -163,7 +163,7 @@ bool UniversalLoggingImpl::IsClusterMaster()
   {
     return true; // if we are not in cluster mode, we are always the master
   }
-  return Manager->IsMaster();
+  return Manager->IsMaster() || !Manager->IsSlave();
 }
 
 FString UniversalLoggingImpl::GetNodeName()

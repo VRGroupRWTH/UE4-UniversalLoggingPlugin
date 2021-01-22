@@ -5,6 +5,7 @@ public class UniversalLogging : ModuleRules
 {
     public UniversalLogging(ReadOnlyTargetRules Target) : base(Target)
     {
+        bLegacyPublicIncludePaths = false;
 
         PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 
