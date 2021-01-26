@@ -48,6 +48,16 @@ FString LogStreamImpl::GetFilename()
   return Filename;
 }
 
+void LogStreamImpl::SetPrefix(FString Prefix)
+{
+  MessagePrefix = Prefix;
+}
+
+FString LogStreamImpl::GetPrefix() const
+{
+  return MessagePrefix;
+}
+
 void LogStreamImpl::SetOnScreen(const bool Val)
 {
   bOnScreen = Val;
@@ -177,5 +187,5 @@ void LogStreamImpl::Write(const FString Text)
     return;
   if (!Log_File_Stream->GetIsOpen())
     Open();
-  Log_File_Stream->Write(Text);
+  Log_File_Stream->Write(MessagePrefix + Text);
 }

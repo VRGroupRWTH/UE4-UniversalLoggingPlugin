@@ -16,6 +16,9 @@ public:
   FString GetFilepath() override;
   FString GetFilename() override;
 
+  void SetPrefix(FString Prefix) override;
+  FString GetPrefix() const override;
+
   void SetOnScreen(const bool Val) override;
   bool GetOnScreen() const override;
   void SetOnScreenColor(const FColor Color) override;
@@ -48,6 +51,7 @@ public:
 private:
   const FString Filepath;
   const FString Filename;
+  FString MessagePrefix;
   bool bPer_Session;
 
   bool bOnScreen;

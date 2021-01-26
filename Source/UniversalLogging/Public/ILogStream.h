@@ -7,6 +7,9 @@ public:
   virtual FString GetFilename() = 0;
   virtual bool GetIsValid() = 0;
 
+  virtual void SetPrefix(FString Prefix) = 0;
+  virtual FString GetPrefix() const = 0;
+
   virtual void SetOnScreen(const bool Val) = 0;
   virtual bool GetOnScreen() const = 0;
   virtual void SetOnScreenColor(const FColor Color) = 0;
