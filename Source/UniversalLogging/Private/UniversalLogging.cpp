@@ -7,6 +7,8 @@
 #include "Cluster/IDisplayClusterClusterManager.h"
 #include "Misc/CommandLine.h"
 
+LogFileManager UniversalLoggingImpl::Log_File_Manager = LogFileManager();
+
 void UniversalLoggingImpl::StartupModule()
 {
   Streams.Add("", MakeUnique<LogStreamImpl>());
@@ -172,6 +174,11 @@ FString UniversalLoggingImpl::GetNodeName()
     return IDisplayCluster::Get().GetClusterMgr()->GetNodeId();
   else 
     return FString(TEXT("Localhost"));
+}
+
+LogFileManager* UniversalLoggingImpl::GetLogFileManager()
+{
+  return &Log_File_Manager;
 }
 
 IMPLEMENT_MODULE(UniversalLoggingImpl, UniversalLogging)

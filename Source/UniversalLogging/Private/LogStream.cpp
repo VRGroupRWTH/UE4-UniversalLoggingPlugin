@@ -152,7 +152,7 @@ void LogStreamImpl::Open()
   FString File_Path = Filepath;
   if(bPer_Session)
     File_Path = FPaths::Combine(File_Path, UniLog.GetSessionIdentifier());
-  Log_File_Stream = new LogFileStream(File_Path, Filename); // this will not stay like this, as LogFileStreams will be managed by LogFileManager
+  Log_File_Stream = UniversalLoggingImpl::GetLogFileManager()->GetLogFileStream(File_Path, Filename); // this will not stay like this, as LogFileStreams will be managed by LogFileManager
   Log_File_Stream->Open();
   if (!Log_File_Stream->GetIsOpen())
   {
