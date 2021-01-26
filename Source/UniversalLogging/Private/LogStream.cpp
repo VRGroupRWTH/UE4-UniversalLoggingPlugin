@@ -1,7 +1,6 @@
 #include "LogStream.h"
 #include "UniversalLogging.h"
 
-#include "HAL/PlatformFilemanager.h"
 #include "Misc/Paths.h"
 
 LogStreamImpl::LogStreamImpl(const FString Filepath, const FString Filename, const bool bPer_Session, const bool bLogOnMaster, const bool bLogOnSlaves)
@@ -18,14 +17,13 @@ LogStreamImpl::LogStreamImpl(const FString Filepath, const FString Filename, con
   , bLogOnSlaves(bLogOnSlaves)
   , bLogOnScreenOnMaster(true)
   , bLogOnScreenOnSlaves(false)
-  , bIs_Open(false)
   , bIs_Valid(false)
-  , File_Handle(nullptr)
+  , Log_File_Stream(nullptr)
 {
   if ((bLogOnMaster && UniversalLoggingImpl::IsClusterMaster()) || (bLogOnSlaves && !UniversalLoggingImpl::IsClusterMaster()))
   {
     Open();
-    if (bIs_Open)
+    if (GetIsOpen())
       bIs_Valid = true;
     Close();
   }
@@ -151,40 +149,33 @@ bool LogStreamImpl::GetIsValid()
 
 void LogStreamImpl::Open()
 {
-  IPlatformFile& platform_file = FPlatformFileManager::Get().GetPlatformFile();
-  FString file_path = FPaths::ConvertRelativePathToFull(FPaths::ProjectDir() + Filepath);
+  FString File_Path = Filepath;
   if(bPer_Session)
-    file_path += "/" + UniLog.GetSessionIdentifier();
-  platform_file.CreateDirectoryTree(*file_path);
-  file_path += "/" + Filename;
-  File_Handle = platform_file.OpenWrite(*file_path);
-  if (!File_Handle)
+    File_Path = FPaths::Combine(File_Path, UniLog.GetSessionIdentifier());
+  Log_File_Stream = new LogFileStream(File_Path, Filename); // this will not stay like this, as LogFileStreams will be managed by LogFileManager
+  Log_File_Stream->Open();
+  if (!Log_File_Stream->GetIsOpen())
   {
-    UE_LOG(LogTemp, Error, TEXT("Universal Logging: The file %s could not be opened for writing."), *file_path);
-    bIs_Open = false;
     bIs_Valid = false;
     return;
   }
-  bIs_Open = true;
 }
 
 void LogStreamImpl::Close()
 {
-  delete File_Handle;
-  File_Handle = nullptr;
-  bIs_Open = false;
+  Log_File_Stream->Close();
 }
 
 bool LogStreamImpl::GetIsOpen() const
 {
-  return bIs_Open;
+  return Log_File_Stream->GetIsOpen();
 }
 
 void LogStreamImpl::Write(const FString Text)
 {
   if (!bIs_Valid)
     return;
-  if (!bIs_Open)
+  if (!Log_File_Stream->GetIsOpen())
     Open();
-  File_Handle->Write(reinterpret_cast<const uint8*>(TCHAR_TO_ANSI(*Text)), Text.Len());
+  Log_File_Stream->Write(Text);
 }

@@ -2,6 +2,8 @@
 
 #include "ILogStream.h"
 
+#include "LogFileStream.h"
+
 #include "Math/Color.h"
 
 class LogStreamImpl : public ILogStream
@@ -62,8 +64,7 @@ private:
   bool bLogOnScreenOnMaster;
   bool bLogOnScreenOnSlaves;
 
-  bool bIs_Open;
   bool bIs_Valid;
 
-  IFileHandle* File_Handle;
+  LogFileStream* Log_File_Stream;
 };
