@@ -26,7 +26,7 @@ FString UUniLogBlueprintFunctionLibrary::GetSessionIdentifier()
 }
 
 void UUniLogBlueprintFunctionLibrary::NewLogStream(const FString StreamName, const FString Filepath,
-                                                   const FString Filename, bool bPer_Session, bool bOnScreen/* = false*/,
+                                                   const FString Filename, FString Prefix, bool bPer_Session, bool bOnScreen/* = false*/,
                                                    FColor OnScreenColor/* = FColor(0, 0, 255, 0)*/,
                                                    FColor OnScreenBackgroundColor, float OnScreenSize,
                                                    float OnScreenDuration,
@@ -36,6 +36,7 @@ void UUniLogBlueprintFunctionLibrary::NewLogStream(const FString StreamName, con
                                                    bool bLogOnScreenOnSlaves/* = false*/)
 {
   auto LogStream = UniLog.NewLogStream(StreamName, Filepath, Filename, bPer_Session, bLogOnMaster, bLogOnSlaves);
+  LogStream->SetPrefix(Prefix);
   LogStream->SetOnScreen(bOnScreen);
   LogStream->SetOnScreenColor(OnScreenColor);
   LogStream->SetOnScreenBackgroundColor(OnScreenBackgroundColor);

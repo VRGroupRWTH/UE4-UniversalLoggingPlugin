@@ -23,7 +23,7 @@ class UUniLogBlueprintFunctionLibrary : public UBlueprintFunctionLibrary
     static FString GetSessionIdentifier();
 
   UFUNCTION(BlueprintCallable, Category = "UniLog")
-    static void NewLogStream(const FString StreamName, const FString Filepath, const FString Filename,
+    static void NewLogStream(const FString StreamName, const FString Filepath, const FString Filename, FString Prefix,
                              bool bPer_Session = false, bool bOnScreen = false,
                              FColor OnScreenColor = FColor(255, 255, 255, 255),
                              FColor OnScreenBackgroundColor = FColor(0, 0, 0, 128),

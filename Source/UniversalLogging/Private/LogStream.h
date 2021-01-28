@@ -2,6 +2,8 @@
 
 #include "ILogStream.h"
 
+#include "LogFileStream.h"
+
 #include "Math/Color.h"
 
 class LogStreamImpl : public ILogStream
@@ -13,6 +15,9 @@ public:
 
   FString GetFilepath() override;
   FString GetFilename() override;
+
+  void SetPrefix(FString Prefix) override;
+  FString GetPrefix() const override;
 
   void SetOnScreen(const bool Val) override;
   bool GetOnScreen() const override;
@@ -46,6 +51,7 @@ public:
 private:
   const FString Filepath;
   const FString Filename;
+  FString MessagePrefix;
   bool bPer_Session;
 
   bool bOnScreen;
@@ -62,8 +68,7 @@ private:
   bool bLogOnScreenOnMaster;
   bool bLogOnScreenOnSlaves;
 
-  bool bIs_Open;
   bool bIs_Valid;
 
-  IFileHandle* File_Handle;
+  LogFileStream* Log_File_Stream;
 };

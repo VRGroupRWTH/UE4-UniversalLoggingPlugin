@@ -75,6 +75,16 @@ UniLog.Log("Message", "StreamName");
 UniLog.LogF("StreamName", "Message %s", *variable);
 ```
 
+### Send Multiple LogStreams to the Same File
+
+You can simply specify the same file name and file path in multiple LogStreams. The output of both streams will be written to this file. This can be useful to have separate streams for errors or warnings. To distinguish the streams, you can use 
+
+```cpp
+stream->SetPrefix("Warning: "); // No additional space will be added after the prefix, so make sure to add one if you want that
+```
+
+to set a prefix that will automatically be added to every message that is written to the file (this will not show up in the on screen log).
+
 ### On Screen Logging
 
 You can also display the log messages on screen. This can even be enabled/disabled during runtime. To do this, use the ILogStream interface:

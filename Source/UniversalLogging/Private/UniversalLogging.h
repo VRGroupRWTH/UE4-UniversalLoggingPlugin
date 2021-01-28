@@ -3,6 +3,7 @@
 #include "LogStream.h"
 #include "OnScreenLog.h"
 #include "IUniversalLogging.h"
+#include "LogFileManager.h"
 
 #include "Engine/World.h"
 
@@ -32,7 +33,10 @@ public:
   static bool IsClusterMaster(); 
   static FString GetNodeName();
 
+  static LogFileManager* GetLogFileManager();
+
 private:
+  static LogFileManager Log_File_Manager;
   TMap<FString, TUniquePtr<LogStreamImpl>> Streams;
   FString Session_ID;
   TBaseDelegate<void, UWorld*, const UWorld::InitializationValues> On_Post_World_Initialization_Delegate;
