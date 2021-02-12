@@ -1,6 +1,9 @@
 #pragma once
 
+#if PLATFORM_WINDOWS || PLATFORM_LINUX
 #include "IDisplayCluster.h"
+#endif
+
 #include "Modules/ModuleManager.h"
 
 #include "ILogStream.h"

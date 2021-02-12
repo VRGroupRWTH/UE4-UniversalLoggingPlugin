@@ -20,7 +20,11 @@
   "Plugins": [
     {
       "Name": "nDisplay",
-      "Enabled": true
+      "Enabled": true,
+      "WhitelistPlatforms": [
+        "Win64",
+        "Linux"
+      ]
     }
   ]
 }

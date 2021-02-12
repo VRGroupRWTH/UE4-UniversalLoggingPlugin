@@ -3,8 +3,10 @@
 #include "LogStream.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/HUD.h"
+#if PLATFORM_WINDOWS || PLATFORM_LINUX
 #include "IDisplayCluster.h"
 #include "Cluster/IDisplayClusterClusterManager.h"
+#endif
 #include "Misc/CommandLine.h"
 
 void UniversalLoggingImpl::StartupModule()
@@ -154,6 +156,7 @@ void UniversalLoggingImpl::ResetSessionId(FString Prefix)
 
 bool UniversalLoggingImpl::IsClusterMaster()
 {
+#if PLATFORM_WINDOWS || PLATFORM_LINUX
   if (!IDisplayCluster::IsAvailable()) 
   {
      return true;
@@ -164,14 +167,21 @@ bool UniversalLoggingImpl::IsClusterMaster()
     return true; // if we are not in cluster mode, we are always the master
   }
   return Manager->IsMaster() || !Manager->IsSlave();
+#else
+  return true;
+#endif
 }
 
 FString UniversalLoggingImpl::GetNodeName()
 {
+#if PLATFORM_WINDOWS || PLATFORM_LINUX
   if (IDisplayCluster::Get().GetOperationMode() == EDisplayClusterOperationMode::Cluster)
     return IDisplayCluster::Get().GetClusterMgr()->GetNodeId();
   else 
     return FString(TEXT("Localhost"));
+#else
+	return FString(TEXT("Localhost"));
+#endif
 }
 
 IMPLEMENT_MODULE(UniversalLoggingImpl, UniversalLogging)
