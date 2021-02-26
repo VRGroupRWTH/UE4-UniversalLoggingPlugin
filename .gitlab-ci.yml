@@ -7,7 +7,7 @@
 
 include:
   - project: 'vr-group/unreal-development/unreal-ci'
-    ref: feature/plugin_project_generation 
+    ref: master
     file: '/shared_scripts.yml'
     
 # In this file you are able to configure your plugins pipeline.
