@@ -66,6 +66,7 @@ Build_CentOS:
     only: ['web', 'schedules']
     extends: .Build_CentOS_
     tags:
+        - centos
         - unreal-4.26
     variables:
         GIT_STRATEGY: none   
