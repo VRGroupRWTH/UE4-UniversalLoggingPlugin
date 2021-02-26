@@ -54,6 +54,9 @@ Generate_Project:
 Build_Windows:
     only: ['web', 'schedules']
     extends: .Build_Windows_
+    tags:
+        - windows
+        - unreal-4.26
     variables:
         GIT_STRATEGY: none   
         GIT_CHECKOUT: "false"
