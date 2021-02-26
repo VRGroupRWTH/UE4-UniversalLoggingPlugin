@@ -13,5 +13,5 @@ private:
   virtual ~LogFileManager();
 
 private:
-  TMap<FString, TSharedPtr<LogFileStream>> Streams;
+  TMap<FString, TUniquePtr<LogFileStream>> Streams;
 };

@@ -7,7 +7,7 @@
 #include "Cluster/IDisplayClusterClusterManager.h"
 #include "Misc/CommandLine.h"
 
-LogFileManager UniversalLoggingImpl::Log_File_Manager = LogFileManager();
+LogFileManager UniversalLoggingImpl::Log_File_Manager{};
 
 void UniversalLoggingImpl::StartupModule()
 {
