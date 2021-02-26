@@ -65,10 +65,12 @@ Build_Windows:
 Build_CentOS:
     only: ['web', 'schedules']
     extends: .Build_CentOS_
+    tags:
+        - unreal-4.26
     variables:
         GIT_STRATEGY: none   
         GIT_CHECKOUT: "false"
-       #CLIENT_CONFIG: "DebugGame"
+        CLIENT_CONFIG: "DebugGame"
     needs:
         - job: "Generate_Project"
           artifacts: true
