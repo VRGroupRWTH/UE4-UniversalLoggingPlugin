@@ -6,7 +6,7 @@ LogFileStream* LogFileManager::GetLogFileStream(FString FilePath, FString FileNa
   if (Streams.Contains(Full_Path))
     return Streams[Full_Path].Get();
   else
-    Streams.Add(Full_Path, MakeUnique<LogFileStream>(FilePath, FileName));
+    Streams.Add(Full_Path, MakeShared<LogFileStream>(FilePath, FileName));
   return Streams[Full_Path].Get();
 }
 
