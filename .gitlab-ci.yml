@@ -45,6 +45,11 @@ stages:
 Generate_Project:
     only: ['web', 'schedules']
     extends: .Generate_Project_
+    variables:
+        GEN_TEMPLATE_REPO: "https://devhub.vr.rwth-aachen.de/VR-Group/unreal-development/unrealprojecttemplate.git"
+        GEN_TEMPLATE_BRANCH: "develop"
+        GEN_DEPENDENCIES: "(
+        )"
 
 Build_Windows:
     only: ['web', 'schedules']
