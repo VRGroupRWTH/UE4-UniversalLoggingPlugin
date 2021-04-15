@@ -39,8 +39,8 @@ private:
   static LogFileManager Log_File_Manager;
   TMap<FString, TUniquePtr<LogStreamImpl>> Streams;
   FString Session_ID;
-  TBaseDelegate<void, UWorld*, const UWorld::InitializationValues> On_Post_World_Initialization_Delegate;
-  TBaseDelegate<void, UWorld*> On_Pre_World_Finish_Destroy_Delegate;
-  TBaseDelegate<void, UWorld*, ELevelTick, float> On_World_Post_Actor_Tick_Delegate;
+  TDelegate<void(UWorld*, const UWorld::InitializationValues)> On_Post_World_Initialization_Delegate;
+  TDelegate<void(UWorld*)> On_Pre_World_Finish_Destroy_Delegate;
+  TDelegate<void(UWorld*, ELevelTick, float)> On_World_Post_Actor_Tick_Delegate;
   AOnScreenLog* On_Screen_Log_Actor;
 };
