@@ -12,6 +12,11 @@ public class UniversalLogging : ModuleRules
         PrivateIncludePaths.AddRange(new string[] {  });
         PublicIncludePaths.AddRange(new string[] {  });
 
-        PublicDependencyModuleNames.AddRange(new string[] { "CoreUObject", "Engine", "Core", "DisplayCluster" });
+        PublicDependencyModuleNames.AddRange(new string[] { "CoreUObject", "Engine", "Core" });
+        
+        if (Target.Platform == UnrealTargetPlatform.Linux || Target.Platform == UnrealTargetPlatform.Win64)
+        {
+            PublicDependencyModuleNames.AddRange(new string[] { "DisplayCluster" });
+        }
     }
 }
