@@ -130,7 +130,7 @@ void UniversalLoggingImpl::Log(const FString Text, const FString Stream /*= ""*/
 
   if(Stream_OBJ->GetLogToDefaultLog())
   {
-    UE_LOG(LogTemp, Log, TEXT("[Universal Logging][%s] %s"), *Stream, *Full_Text);
+    UE_LOG(LogUni, Log, TEXT("[%s] %s"), *Stream, *Full_Text);
   }
 }
 

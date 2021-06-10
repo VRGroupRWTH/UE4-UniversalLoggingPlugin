@@ -1,7 +1,7 @@
 #include "LogFileStream.h"
 
 #include "HAL/PlatformFilemanager.h"
-
+#include "LogStream.h"
 #include "Misc/Paths.h"
 
 LogFileStream::LogFileStream(const FString Filepath, const FString Filename)
@@ -26,7 +26,7 @@ void LogFileStream::Open()
   File_Handle = platform_file.OpenWrite(*file_path);
   if (!File_Handle)
   {
-    UE_LOG(LogTemp, Error, TEXT("Universal Logging: The file %s could not be opened for writing."), *file_path);
+    UE_LOG(LogUni, Error, TEXT("Universal Logging: The file %s could not be opened for writing."), *file_path);
     bIs_Open = false;
     return;
   }

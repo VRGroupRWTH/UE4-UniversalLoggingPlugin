@@ -3,6 +3,9 @@
 
 #include "Misc/Paths.h"
 
+DEFINE_LOG_CATEGORY(LogUni);
+
+
 LogStreamImpl::LogStreamImpl(const FString Filepath, const FString Filename, const bool bPer_Session, const bool bLogOnMaster, const bool bLogOnSlaves)
   : Filepath(Filepath)
   , Filename(Filename)
