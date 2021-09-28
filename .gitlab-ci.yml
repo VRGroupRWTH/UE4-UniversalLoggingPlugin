@@ -47,7 +47,7 @@ Generate_Project:
     extends: .Generate_Project_
     variables:
         GEN_TEMPLATE_REPO: "https://devhub.vr.rwth-aachen.de/VR-Group/unreal-development/unrealprojecttemplate.git"
-        GEN_TEMPLATE_BRANCH: "develop"
+        GEN_TEMPLATE_BRANCH: "4.26"
         GEN_DEPENDENCIES: "(
         )"
 
@@ -60,7 +60,7 @@ Build_Windows:
     variables:
         GIT_STRATEGY: none   
         GIT_CHECKOUT: "false"
-       #CLIENT_CONFIG: "DebugGame"
+        CLIENT_CONFIG: "DebugGame"
     needs:
         - job: "Generate_Project"
           artifacts: true
