@@ -49,5 +49,5 @@ void LogFileStream::Write(const FString Text)
 {
   if (!bIs_Open)
     Open();
-  File_Handle->Write(reinterpret_cast<const uint8*>(TCHAR_TO_ANSI(*Text)), Text.Len());
+  File_Handle->Write(reinterpret_cast<const uint8*>(TCHAR_TO_UTF8(*Text)), Text.Len());
 }
