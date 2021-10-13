@@ -64,8 +64,10 @@ void UniversalLoggingImpl::OnPostActorTick(UWorld* World, ELevelTick LevelTick, 
     return;
   auto HUD = PlayerController->GetHUD();
   if (HUD)
+  {
     HUD->AddPostRenderedActor(On_Screen_Log_Actor); // Doing this every tick seems excessive (AddPostRenderActor checks for duplicates, though)
-  HUD->bShowOverlays = true; // Yuck, but necessary as otherwise the Actor's PostRenderFor method is not called.
+    HUD->bShowOverlays = true; // Yuck, but necessary as otherwise the Actor's PostRenderFor method is not called.  
+  }
 }
 
 ILogStream* UniversalLoggingImpl::NewLogStream(const FString StreamName)
