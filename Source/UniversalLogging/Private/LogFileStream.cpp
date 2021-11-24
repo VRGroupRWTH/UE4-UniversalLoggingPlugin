@@ -35,7 +35,10 @@ void LogFileStream::Open()
 
 void LogFileStream::Close()
 {
-  delete File_Handle;
+  if(File_Handle)
+  {
+    delete File_Handle;
+  }
   File_Handle = nullptr;
   bIs_Open = false;
 }
