@@ -7,7 +7,9 @@
 #include "IDisplayCluster.h"
 #include "Cluster/IDisplayClusterClusterManager.h"
 #endif
+#if WITH_EDITOR
 #include "Editor.h"
+#endif
 #include "Misc/CommandLine.h"
 
 LogFileManager UniversalLoggingImpl::Log_File_Manager{};
