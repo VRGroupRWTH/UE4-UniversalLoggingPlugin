@@ -23,7 +23,7 @@ void LogFileStream::Open()
   FString file_path = FPaths::ConvertRelativePathToFull(FPaths::ProjectDir() + Filepath);
   platform_file.CreateDirectoryTree(*file_path);
   file_path = FPaths::Combine(file_path, Filename);
-  File_Handle = platform_file.OpenWrite(*file_path);
+  File_Handle.Reset(platform_file.OpenWrite(*file_path));
   if (!File_Handle)
   {
     UE_LOG(LogUni, Error, TEXT("Universal Logging: The file %s could not be opened for writing."), *file_path);
@@ -35,11 +35,7 @@ void LogFileStream::Open()
 
 void LogFileStream::Close()
 {
-  if(File_Handle)
-  {
-    delete File_Handle;
-  }
-  File_Handle = nullptr;
+  File_Handle.Reset();
   bIs_Open = false;
 }
 
