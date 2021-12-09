@@ -18,5 +18,11 @@ public class UniversalLogging : ModuleRules
         {
             PublicDependencyModuleNames.AddRange(new string[] { "DisplayCluster" });
         }
+
+        //this is needed to register on Editor delegates, i.e., BeginPIE and EndPIE, but only in Editor builds
+        if (Target.Type == TargetRules.TargetType.Editor)
+        {
+            PrivateDependencyModuleNames.AddRange(new string[] { "UnrealEd" });
+        }
     }
 }
