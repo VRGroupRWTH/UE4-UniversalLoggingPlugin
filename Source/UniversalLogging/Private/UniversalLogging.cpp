@@ -1,53 +1,64 @@
 #include "UniversalLogging.h"
 
-#include "UniversalLoggingPrivatePCH.h"
-
-
 #include "LogStream.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/HUD.h"
+#if PLATFORM_WINDOWS || PLATFORM_LINUX
 #include "IDisplayCluster.h"
 #include "Cluster/IDisplayClusterClusterManager.h"
+#endif
+#if WITH_EDITOR
+#include "Editor.h"
+#endif
 #include "Misc/CommandLine.h"
+
+LogFileManager UniversalLoggingImpl::Log_File_Manager{};
 
 void UniversalLoggingImpl::StartupModule()
 {
   Streams.Add("", MakeUnique<LogStreamImpl>());
 
-  On_Post_World_Initialization_Delegate.BindRaw(this, &UniversalLoggingImpl::OnSessionStart);
-  FWorldDelegates::OnPostWorldInitialization.Add(On_Post_World_Initialization_Delegate);
+  FWorldDelegates::OnPostWorldInitialization.AddRaw(this, &UniversalLoggingImpl::OnWorldStart);
+  FWorldDelegates::OnWorldPostActorTick.AddRaw(this, &UniversalLoggingImpl::OnPostActorTick);
 
-  On_Pre_World_Finish_Destroy_Delegate.BindRaw(this, &UniversalLoggingImpl::OnSessionEnd);
-  FWorldDelegates::OnPreWorldFinishDestroy.Add(On_Pre_World_Finish_Destroy_Delegate);
+#if WITH_EDITOR
+	FEditorDelegates::BeginPIE.AddRaw(this, &UniversalLoggingImpl::OnSessionStart);
+	FEditorDelegates::EndPIE.AddRaw(this, &UniversalLoggingImpl::OnSessionEnd);
+#endif
 
-  On_World_Post_Actor_Tick_Delegate.BindRaw(this, &UniversalLoggingImpl::OnPostActorTick);
-  FWorldDelegates::OnWorldPostActorTick.Add(On_World_Post_Actor_Tick_Delegate);
-
-  Session_ID = "";
+	Session_ID = "";
 }
 
 void UniversalLoggingImpl::ShutdownModule()
 {
 }
 
-void UniversalLoggingImpl::OnSessionStart(UWorld* World, const UWorld::InitializationValues)
+void UniversalLoggingImpl::OnWorldStart(UWorld* World, const UWorld::InitializationValues)
 {
   if (!World->IsGameWorld())
     return;
-  if (World->IsPlayInEditor())
+
+  On_Screen_Log_Actor = dynamic_cast<AOnScreenLog*>(World->SpawnActor(AOnScreenLog::StaticClass()));
+
+	//only set Session_ID on the first world of this session
+	if(Session_ID != "")
+		return;
+
+	if (World->IsPlayInEditor())
     ResetSessionId("PlayInEditor");
   else if (World->IsPlayInPreview())
     ResetSessionId("PlayInPreview");
   else
     ResetSessionId("Play");
-
-  On_Screen_Log_Actor = dynamic_cast<AOnScreenLog*>(World->SpawnActor(AOnScreenLog::StaticClass()));
 }
 
-void UniversalLoggingImpl::OnSessionEnd(UWorld* World)
+void UniversalLoggingImpl::OnSessionStart(const bool)
 {
-  if (!World->IsGameWorld())
-    return;
+  Session_ID = "";
+}
+
+void UniversalLoggingImpl::OnSessionEnd(const bool)
+{
   ResetSessionId("Stopped");
 
   for (auto& Elem : Streams)
@@ -62,8 +73,11 @@ void UniversalLoggingImpl::OnPostActorTick(UWorld* World, ELevelTick LevelTick, 
   if (!PlayerController) 
     return;
   auto HUD = PlayerController->GetHUD();
-  HUD->AddPostRenderedActor(On_Screen_Log_Actor); // Doing this every tick seems excessive (AddPostRenderActor checks for duplicates, though)
-  HUD->bShowOverlays = true; // Yuck, but necessary as otherwise the Actor's PostRenderFor method is not called.
+  if (HUD)
+  {
+    HUD->AddPostRenderedActor(On_Screen_Log_Actor); // Doing this every tick seems excessive (AddPostRenderActor checks for duplicates, though)
+    HUD->bShowOverlays = true; // Yuck, but necessary as otherwise the Actor's PostRenderFor method is not called.  
+  }
 }
 
 ILogStream* UniversalLoggingImpl::NewLogStream(const FString StreamName)
@@ -122,7 +136,14 @@ void UniversalLoggingImpl::Log(const FString Text, const FString Stream /*= ""*/
   if(Stream_OBJ->GetOnScreen() && On_Screen_Log_Actor)
   {
     if ((Stream_OBJ->GetLogOnScreenOnMaster() && IsClusterMaster()) || (Stream_OBJ->GetLogOnScreenOnSlaves() && !IsClusterMaster()))
-    On_Screen_Log_Actor->EnqueueMessage(Full_Text, Stream_OBJ->GetOnScreenColor());
+    On_Screen_Log_Actor->EnqueueMessage(Full_Text, Stream_OBJ->GetOnScreenColor(),
+                                        Stream_OBJ->GetOnScreenBackgroundColor(), Stream_OBJ->GetOnScreenSize(),
+                                        Stream_OBJ->GetOnScreenDuration());
+  }
+
+  if(Stream_OBJ->GetLogToDefaultLog())
+  {
+    UE_LOG(LogUni, Log, TEXT("[%s] %s"), *Stream, *Full_Text);
   }
 }
 
@@ -150,6 +171,7 @@ void UniversalLoggingImpl::ResetSessionId(FString Prefix)
 
 bool UniversalLoggingImpl::IsClusterMaster()
 {
+#if PLATFORM_WINDOWS || PLATFORM_LINUX
   if (!IDisplayCluster::IsAvailable()) 
   {
      return true;
@@ -159,15 +181,27 @@ bool UniversalLoggingImpl::IsClusterMaster()
   {
     return true; // if we are not in cluster mode, we are always the master
   }
-  return Manager->IsMaster();
+  return Manager->IsMaster() || !Manager->IsSlave();
+#else
+  return true;
+#endif
 }
 
 FString UniversalLoggingImpl::GetNodeName()
 {
+#if PLATFORM_WINDOWS || PLATFORM_LINUX
   if (IDisplayCluster::Get().GetOperationMode() == EDisplayClusterOperationMode::Cluster)
     return IDisplayCluster::Get().GetClusterMgr()->GetNodeId();
   else 
     return FString(TEXT("Localhost"));
+#else
+	return FString(TEXT("Localhost"));
+#endif
+}
+
+LogFileManager* UniversalLoggingImpl::GetLogFileManager()
+{
+  return &Log_File_Manager;
 }
 
 IMPLEMENT_MODULE(UniversalLoggingImpl, UniversalLogging)

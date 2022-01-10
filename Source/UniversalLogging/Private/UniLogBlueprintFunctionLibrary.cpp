@@ -26,26 +26,39 @@ FString UUniLogBlueprintFunctionLibrary::GetSessionIdentifier()
 }
 
 void UUniLogBlueprintFunctionLibrary::NewLogStream(const FString StreamName, const FString Filepath,
-                                                   const FString Filename, bool bPer_Session, bool bOnScreen/* = false*/, 
+                                                   const FString Filename, FString Prefix, bool bPer_Session, bool bOnScreen/* = false*/,
                                                    FColor OnScreenColor/* = FColor(0, 0, 255, 0)*/,
-                                                   bool bLogOnMaster/* = true*/, bool bLogOnSlaves/* = false*/,
+                                                   FColor OnScreenBackgroundColor, float OnScreenSize,
+                                                   float OnScreenDuration,
+                                                   bool bLogToDefaultLog, bool bLogOnMaster/* = true*/,
+                                                   bool bLogOnSlaves/* = false*/,
                                                    bool bLogOnScreenOnMaster/* = true*/,
                                                    bool bLogOnScreenOnSlaves/* = false*/)
 {
   auto LogStream = UniLog.NewLogStream(StreamName, Filepath, Filename, bPer_Session, bLogOnMaster, bLogOnSlaves);
+  LogStream->SetPrefix(Prefix);
   LogStream->SetOnScreen(bOnScreen);
   LogStream->SetOnScreenColor(OnScreenColor);
+  LogStream->SetOnScreenBackgroundColor(OnScreenBackgroundColor);
+  LogStream->SetOnScreenSize(OnScreenSize);
+  LogStream->SetOnScreenDuration(OnScreenDuration);
+  LogStream->SetLogToDefaultLog(bLogToDefaultLog);
   LogStream->SetLogOnScreenOnMaster(bLogOnScreenOnMaster);
   LogStream->SetLogOnScreenOnSlaves(bLogOnScreenOnSlaves);
 }
 
 void UUniLogBlueprintFunctionLibrary::ModifyLogStream(const FString StreamName, bool bOnScreen, FColor OnScreenColor,
-                                                      bool bLogOnScreenOnMaster/* = true*/,
+                                                      FColor OnScreenBackgroundColor,
+                                                      float OnScreenSize, float OnScreenDuration, bool bLogToDefaultLog, bool bLogOnScreenOnMaster/* = true*/,
                                                       bool bLogOnScreenOnSlaves/* = false*/)
 {
   auto LogStream = UniLog.GetLogStream(StreamName);
   LogStream->SetOnScreen(bOnScreen);
   LogStream->SetOnScreenColor(OnScreenColor);
+  LogStream->SetOnScreenBackgroundColor(OnScreenBackgroundColor);
+  LogStream->SetOnScreenSize(OnScreenSize);
+  LogStream->SetOnScreenDuration(OnScreenDuration);
+  LogStream->SetLogToDefaultLog(bLogToDefaultLog);
   LogStream->SetLogOnScreenOnMaster(bLogOnScreenOnMaster);
   LogStream->SetLogOnScreenOnSlaves(bLogOnScreenOnSlaves);
 }

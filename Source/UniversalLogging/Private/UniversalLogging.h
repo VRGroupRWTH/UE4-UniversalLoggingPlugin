@@ -2,6 +2,8 @@
 
 #include "LogStream.h"
 #include "OnScreenLog.h"
+#include "IUniversalLogging.h"
+#include "LogFileManager.h"
 
 #include "Engine/World.h"
 
@@ -12,8 +14,9 @@ public:
   void StartupModule() override;
   void ShutdownModule() override;
 
-  void OnSessionStart(UWorld*, const UWorld::InitializationValues);
-  void OnSessionEnd(UWorld*);
+  void OnWorldStart(UWorld*, const UWorld::InitializationValues);
+	void OnSessionStart(const bool);
+  void OnSessionEnd(const bool);
 
   void OnPostActorTick(UWorld*, ELevelTick, float);
 
@@ -31,11 +34,11 @@ public:
   static bool IsClusterMaster(); 
   static FString GetNodeName();
 
+  static LogFileManager* GetLogFileManager();
+
 private:
+  static LogFileManager Log_File_Manager;
   TMap<FString, TUniquePtr<LogStreamImpl>> Streams;
   FString Session_ID;
-  TBaseDelegate<void, UWorld*, const UWorld::InitializationValues> On_Post_World_Initialization_Delegate;
-  TBaseDelegate<void, UWorld*> On_Pre_World_Finish_Destroy_Delegate;
-  TBaseDelegate<void, UWorld*, ELevelTick, float> On_World_Post_Actor_Tick_Delegate;
   AOnScreenLog* On_Screen_Log_Actor;
 };

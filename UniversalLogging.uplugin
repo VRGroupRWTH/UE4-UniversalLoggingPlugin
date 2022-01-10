@@ -1,21 +1,30 @@
 {
-    "FileVersion" : 3,
+  "FileVersion": 3,
 
-    "FriendlyName" : "Universal Logging Plugin",
-    "Version" : 1,
-    "VersionName": "1.0",
-    "Description" : "This plugin adds universal logging functionality which can be used also in shipping builds.",
-    "Category" : "Logging",
-    "CreatedBy" : "Martin Bellgardt",
-    "CreatedByURL" : "https://bird.lol",
-	"CanContainContent" : "true",
+  "FriendlyName": "Universal Logging Plugin",
+  "Version": 1,
+  "VersionName": "1.0",
+  "Description": "This plugin adds universal logging functionality which can be used also in shipping builds.",
+  "Category": "Logging",
+  "CreatedBy": "Martin Bellgardt",
+  "CreatedByURL": "https://bird.lol",
+  "CanContainContent": "true",
 
-    "Modules" :
-    [
-        {
-            "Name" : "UniversalLogging",
-            "Type" : "Runtime",
-			"LoadingPhase" : "PreDefault"
-        } 
-    ]
+  "Modules": [
+    {
+      "Name": "UniversalLogging",
+      "Type": "Runtime",
+      "LoadingPhase": "PreDefault"
+    }
+  ],
+  "Plugins": [
+    {
+      "Name": "nDisplay",
+      "Enabled": true,
+      "WhitelistPlatforms": [
+        "Win64",
+        "Linux"
+      ]
+    }
+  ]
 }

@@ -1,5 +1,12 @@
 #pragma once
+
+#include "ILogStream.h"
+
+#include "LogFileStream.h"
+
 #include "Math/Color.h"
+
+DECLARE_LOG_CATEGORY_EXTERN(LogUni, Log, All);
 
 class LogStreamImpl : public ILogStream
 {
@@ -11,10 +18,22 @@ public:
   FString GetFilepath() override;
   FString GetFilename() override;
 
+  void SetPrefix(FString Prefix) override;
+  FString GetPrefix() const override;
+
   void SetOnScreen(const bool Val) override;
   bool GetOnScreen() const override;
   void SetOnScreenColor(const FColor Color) override;
   FColor GetOnScreenColor() const override;
+  void SetOnScreenBackgroundColor(const FColor Color) override;
+  FColor GetOnScreenBackgroundColor() const override;
+  void SetOnScreenSize(const float Scale) override;
+  float GetOnScreenSize() const override;
+  void SetOnScreenDuration(const float Seconds) override;
+  float GetOnScreenDuration() const override;
+
+  void SetLogToDefaultLog(const bool Val) override;
+  bool GetLogToDefaultLog() const override;
 
   bool GetLogOnMaster() const override;
   bool GetLogOnSlaves() const override;
@@ -34,10 +53,16 @@ public:
 private:
   const FString Filepath;
   const FString Filename;
+  FString MessagePrefix;
   bool bPer_Session;
 
   bool bOnScreen;
   FColor OnScreenColor;
+  FColor OnScreenBackgroundColor;
+  float OnScreenSize;
+  float OnScreenDuration;
+
+  bool bLogToDefaultLog;
 
   bool bLogOnMaster;
   bool bLogOnSlaves;
@@ -45,8 +70,7 @@ private:
   bool bLogOnScreenOnMaster;
   bool bLogOnScreenOnSlaves;
 
-  bool bIs_Open;
   bool bIs_Valid;
 
-  IFileHandle* File_Handle;
+  LogFileStream* Log_File_Stream;
 };
