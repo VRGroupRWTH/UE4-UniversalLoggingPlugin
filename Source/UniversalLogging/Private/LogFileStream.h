@@ -15,5 +15,5 @@ private:
   const FString Filepath;
   const FString Filename;
   bool bIs_Open;
-  IFileHandle* File_Handle;
+  TUniquePtr <IFileHandle> File_Handle;
 };
