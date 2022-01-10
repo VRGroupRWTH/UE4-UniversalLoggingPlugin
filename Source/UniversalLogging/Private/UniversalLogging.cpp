@@ -7,6 +7,9 @@
 #include "IDisplayCluster.h"
 #include "Cluster/IDisplayClusterClusterManager.h"
 #endif
+#if WITH_EDITOR
+#include "Editor.h"
+#endif
 #include "Misc/CommandLine.h"
 
 LogFileManager UniversalLoggingImpl::Log_File_Manager{};
@@ -15,40 +18,47 @@ void UniversalLoggingImpl::StartupModule()
 {
   Streams.Add("", MakeUnique<LogStreamImpl>());
 
-  On_Post_World_Initialization_Delegate.BindRaw(this, &UniversalLoggingImpl::OnSessionStart);
-  FWorldDelegates::OnPostWorldInitialization.Add(On_Post_World_Initialization_Delegate);
+  FWorldDelegates::OnPostWorldInitialization.AddRaw(this, &UniversalLoggingImpl::OnWorldStart);
+  FWorldDelegates::OnWorldPostActorTick.AddRaw(this, &UniversalLoggingImpl::OnPostActorTick);
 
-  On_Pre_World_Finish_Destroy_Delegate.BindRaw(this, &UniversalLoggingImpl::OnSessionEnd);
-  FWorldDelegates::OnPreWorldFinishDestroy.Add(On_Pre_World_Finish_Destroy_Delegate);
+#if WITH_EDITOR
+	FEditorDelegates::BeginPIE.AddRaw(this, &UniversalLoggingImpl::OnSessionStart);
+	FEditorDelegates::EndPIE.AddRaw(this, &UniversalLoggingImpl::OnSessionEnd);
+#endif
 
-  On_World_Post_Actor_Tick_Delegate.BindRaw(this, &UniversalLoggingImpl::OnPostActorTick);
-  FWorldDelegates::OnWorldPostActorTick.Add(On_World_Post_Actor_Tick_Delegate);
-
-  Session_ID = "";
+	Session_ID = "";
 }
 
 void UniversalLoggingImpl::ShutdownModule()
 {
 }
 
-void UniversalLoggingImpl::OnSessionStart(UWorld* World, const UWorld::InitializationValues)
+void UniversalLoggingImpl::OnWorldStart(UWorld* World, const UWorld::InitializationValues)
 {
   if (!World->IsGameWorld())
     return;
-  if (World->IsPlayInEditor())
+
+  On_Screen_Log_Actor = dynamic_cast<AOnScreenLog*>(World->SpawnActor(AOnScreenLog::StaticClass()));
+
+	//only set Session_ID on the first world of this session
+	if(Session_ID != "")
+		return;
+
+	if (World->IsPlayInEditor())
     ResetSessionId("PlayInEditor");
   else if (World->IsPlayInPreview())
     ResetSessionId("PlayInPreview");
   else
     ResetSessionId("Play");
-
-  On_Screen_Log_Actor = dynamic_cast<AOnScreenLog*>(World->SpawnActor(AOnScreenLog::StaticClass()));
 }
 
-void UniversalLoggingImpl::OnSessionEnd(UWorld* World)
+void UniversalLoggingImpl::OnSessionStart(const bool)
 {
-  if (!World->IsGameWorld())
-    return;
+  Session_ID = "";
+}
+
+void UniversalLoggingImpl::OnSessionEnd(const bool)
+{
   ResetSessionId("Stopped");
 
   for (auto& Elem : Streams)
