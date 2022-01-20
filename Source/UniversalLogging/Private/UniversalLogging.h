@@ -15,6 +15,7 @@ public:
   void ShutdownModule() override;
 
   void OnWorldStart(UWorld*, const UWorld::InitializationValues);
+  void OnWorldEnd(UWorld*,  bool bSessionEnded, bool bCleanupResources);
   void OnSessionStart(const bool);
   void OnSessionEnd(const bool);
 

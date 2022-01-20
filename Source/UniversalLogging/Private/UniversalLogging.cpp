@@ -20,6 +20,7 @@ void UniversalLoggingImpl::StartupModule()
 
   FWorldDelegates::OnPostWorldInitialization.AddRaw(this, &UniversalLoggingImpl::OnWorldStart);
   FWorldDelegates::OnWorldPostActorTick.AddRaw(this, &UniversalLoggingImpl::OnPostActorTick);
+  FWorldDelegates::OnWorldCleanup.AddRaw(this, &UniversalLoggingImpl::OnWorldEnd);
 
 #if WITH_EDITOR
   FEditorDelegates::BeginPIE.AddRaw(this, &UniversalLoggingImpl::OnSessionStart);
@@ -50,6 +51,11 @@ void UniversalLoggingImpl::OnWorldStart(UWorld* World, const UWorld::Initializat
     ResetSessionId("PlayInPreview");
   else
     ResetSessionId("Play");
+}
+
+void UniversalLoggingImpl::OnWorldEnd(UWorld*, bool bSessionEnded, bool bCleanupResources)
+{
+  On_Screen_Log_Actor = nullptr;
 }
 
 void UniversalLoggingImpl::OnSessionStart(const bool)
