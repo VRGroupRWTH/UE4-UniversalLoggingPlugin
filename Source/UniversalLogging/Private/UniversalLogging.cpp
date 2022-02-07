@@ -20,13 +20,14 @@ void UniversalLoggingImpl::StartupModule()
 
   FWorldDelegates::OnPostWorldInitialization.AddRaw(this, &UniversalLoggingImpl::OnWorldStart);
   FWorldDelegates::OnWorldPostActorTick.AddRaw(this, &UniversalLoggingImpl::OnPostActorTick);
+  FWorldDelegates::OnWorldCleanup.AddRaw(this, &UniversalLoggingImpl::OnWorldEnd);
 
 #if WITH_EDITOR
-	FEditorDelegates::BeginPIE.AddRaw(this, &UniversalLoggingImpl::OnSessionStart);
-	FEditorDelegates::EndPIE.AddRaw(this, &UniversalLoggingImpl::OnSessionEnd);
+  FEditorDelegates::BeginPIE.AddRaw(this, &UniversalLoggingImpl::OnSessionStart);
+  FEditorDelegates::EndPIE.AddRaw(this, &UniversalLoggingImpl::OnSessionEnd);
 #endif
 
-	Session_ID = "";
+  Session_ID = "";
 }
 
 void UniversalLoggingImpl::ShutdownModule()
@@ -41,15 +42,20 @@ void UniversalLoggingImpl::OnWorldStart(UWorld* World, const UWorld::Initializat
   On_Screen_Log_Actor = dynamic_cast<AOnScreenLog*>(World->SpawnActor(AOnScreenLog::StaticClass()));
 
 	//only set Session_ID on the first world of this session
-	if(Session_ID != "")
-		return;
+  if(Session_ID != "")
+    return;
 
-	if (World->IsPlayInEditor())
+  if (World->IsPlayInEditor())
     ResetSessionId("PlayInEditor");
   else if (World->IsPlayInPreview())
     ResetSessionId("PlayInPreview");
   else
     ResetSessionId("Play");
+}
+
+void UniversalLoggingImpl::OnWorldEnd(UWorld*, bool bSessionEnded, bool bCleanupResources)
+{
+  On_Screen_Log_Actor = nullptr;
 }
 
 void UniversalLoggingImpl::OnSessionStart(const bool)
